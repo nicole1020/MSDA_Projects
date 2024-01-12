@@ -23,67 +23,7 @@ library(ggplot2)
 #install.packages("dplyr")
 library(dplyr)
 
-
-#z score for X (row identifier) 
-df$X_zScore <- scale(x=df$X)
-#identify X outliers using zscore
-X_outliers <- df[which(df$X_zScore < -3 | df$X_zScore > 3),]
-#calculate quantity of outliers 
-num_of_outliers <- nrow(X_outliers)
-print(num_of_outliers) #output = 0
-#sort data by X outliers
-df_X_sort <- df[order(-df$X_zScore),]
-#print head of df_X_sort
-head(df_X_sort)
-#print first and last 10 rows
-df_X_sort[1:10,c(1,53)]
-df_X_sort[9990:10000,c(1,53)]
-#print first 10 rows, X and churn column
-df_X_sort[1:10,c(1,22)]
-#print first 10 rows,X, techie and churn column
-df_X_sort[1:20,c(1,22,27)]
-#check for null/missing zscores
-sum(is.na(df$X_zScore))
-#z score for CaseOrder 
-df$CaseOrder_zScore <- scale(x=df$CaseOrder)
-#identify CaseOrder outliers using zscore
-CaseOrder_outliers <- df[which(df$CaseOrder_zScore < -3 | df$CaseOrder_zScore > 3),]
-#calculate quantity of outliers 
-num_of_outliers <- nrow(CaseOrder_outliers) #output = 0
-print(num_of_outliers)
-#sort data by CaseOrder outliers
-df_CaseOrder_sort <- df[order(-df$CaseOrder_zScore),]
-#print head of df_CaseOrder_sort
-head(df_CaseOrder_sort)
-#print first and last 10
-df_CaseOrder_sort[1:10,c(1,54)]
-df_CaseOrder_sort[9990:10000,c(1,54)]
-#print first 10 rows, CaseOrder and churn column
-df_CaseOrder_sort[1:10,c(2,22)]
-#print first 10 rows,CaseOrder, techie and churn column
-df_CaseOrder_sort[1:20,c(2,22,27)]
-#check for null/missing zscores
-sum(is.na(df$CaseOrder_zScore))
-#z score for Zip 
-df$Zip_zScore <- scale(x=df$Zip)
-#identify Zip outliers using zscore
-Zip_outliers <- df[which(df$Zip_zScore < -3 | df$Zip_zScore > 3),]
-#calculate quantity of outliers 
-num_of_outliers <- nrow(Zip_outliers) #output = 0
-print(num_of_outliers)
-#sort data by Zip outliers
-df_Zip_sort <- df[order(-df$Zip_zScore),]
-#print head of df_Zip_sort
-head(df_Zip_sort)
-#print first 10 rows
-df_Zip_sort[1:76,c(1,55)]
-df_Zip_sort[9990:10000,c(1,55)]
-#print first 10 rows, Zip and churn column
-df_Zip_sort[1:10,c(8,22)]
-#print first 10 rows,Zip, techie and churn column
-df_Zip_sort[1:20,c(8,22,27)]
-#check for null/missing zscores
-sum(is.na(df$Zip_zScore))
+#calculate outliers for all quantitative variables
 #z score for Lat 
 df$Lat_zScore <- scale(x=df$Lat)
 #identify Lat outliers using zscore
@@ -95,13 +35,14 @@ print(num_of_outliers)
 df_Lat_sort <- df[order(-df$Lat_zScore),]
 #print head of df_Lat_sort
 head(df_Lat_sort)
-#print first 76 rows and last 76 rows in col 56 for Lat_zScore
-df_Lat_sort[1:76,c(1,56)]
-df_Lat_sort[9926:10000,c(1,56)]
+summary(df_Lat_sort)
+#print first 76 rows and last 76 rows in col 53 for Lat_zScore
+df_Lat_sort[1:76,c(1,53)]
+df_Lat_sort[9926:10000,c(1,53)]
 #print first 10 rows, Lat and churn column
-df_Lat_sort[1:10,c(9,22)]
+df_Lat_sort[1:10,c(9,53)]
 #print first 10 rows,Lat, techie and churn column
-df_Lat_sort[1:20,c(9,22,27)]
+df_Lat_sort[1:20,c(9,22,53)]
 #check for null/missing zscores
 sum(is.na(df$Lat_zScore))
 #z score for Lng 
@@ -115,8 +56,8 @@ print(num_of_outliers)
 df_Lng_sort <- df[order(-df$Lng_zScore),]
 #print head of df_Lng_sort
 head(df_Lng_sort)
-#print first and last 102 rows in col 57 for Lng_zScore
-df_Lng_sort[9899:10000,c(1,57)]
+#print first and last 102 rows in col 54 for Lng_zScore
+df_Lng_sort[9899:10000,c(1,54)]
 #print first 10 rows, Lng and churn column
 df_Lng_sort[1:10,c(10,22)]
 #print first 10 rows,Lng, techie and churn column
@@ -135,7 +76,7 @@ df_Population_sort <- df[order(-df$Population_zScore),]
 #print head of df_Population_sort
 head(df_Population_sort)
 #print first 219 rows of population zscore col
-df_Population_sort[1:219,c(1,58)]
+df_Population_sort[1:219,c(1,55)]
 #print first 10 rows, Population and churn column
 df_Population_sort[1:10,c(11,22)]
 #print first 10 rows,Population, techie and churn column
@@ -153,8 +94,8 @@ print(num_of_outliers)
 df_Children_sort <- df[order(-df$Children_zScore),]
 #print head of df_Children_sort
 head(df_Children_sort)
-#print first 10 rows 302 col 59
-df_Children_sort[1:302,c(1,59)]
+#print first 10 rows 302 col 56
+df_Children_sort[1:302,c(1,56)]
 #print first 10 rows, Children and churn column
 df_Children_sort[1:10,c(15,22)]
 #print first 10 rows,Children, techie and churn column
@@ -173,7 +114,7 @@ df_age_sort <- df[order(-df$Age_zScore),]
 #print head of df_age_sort
 head(df_age_sort)
 #print first 10 rows
-df_age_sort[1:10,c(1,60)]
+df_age_sort[1:10,c(1,57)]
 #print first 10 rows, age and churn column
 df_age_sort[1:10,c(16,22)]
 #print first 10 rows,age, techie and churn column
@@ -192,7 +133,7 @@ df_Income_sort <- df[order(-df$Income_zScore),]
 #print head of df_Income_sort
 head(df_Income_sort)
 #print first 110 rows and last 70
-df_Income_sort[1:180,c(1,61)]
+df_Income_sort[1:180,c(1,58)]
 # df_Income_sort[9705:10000,61]
 #print first 10 rows, Income and churn column
 df_Income_sort[1:10,c(19,22)]
@@ -212,7 +153,7 @@ df_Outage_sec_perweek_sort <- df[order(-df$Outage_sec_perweek_zScore),]
 #print head of df_Outage_sec_perweek_sort
 head(df_Outage_sec_perweek_sort)
 #print first 491 rows
-df_Outage_sec_perweek_sort[1:491,c(1,62)]
+df_Outage_sec_perweek_sort[1:491,c(1,59)]
 #print first 10 rows, Outage_sec_perweek and churn column
 df_Outage_sec_perweek_sort[1:10,c(23,22)]
 #print first 10 rows,Outage_sec_perweek, techie and churn column
@@ -231,8 +172,8 @@ df_Email_sort <- df[order(-df$Email_zScore),]
 #print head of df_Email_sort
 head(df_Email_sort)
 #print 12 rows with outliers
-df_Email_sort[1:3,c(1,63)]
-df_Email_sort[9992:10000,63]
+df_Email_sort[1:3,c(1,60)]
+df_Email_sort[9992:10000,60]
 #print first 10 rows, Email and churn column
 df_Email_sort[1:10,c(24,22)]
 #print first 10 rows,Email, techie and churn column
@@ -251,7 +192,7 @@ df_Contacts_sort <- df[order(-df$Contacts_zScore),]
 #print head of df_Contacts_sort
 head(df_Contacts_sort)
 #print first 165 rows
-df_Contacts_sort[1:165,c(1,64)]
+df_Contacts_sort[1:165,c(1,61)]
 #print first 10 rows, Contacts and churn column
 df_Contacts_sort[1:10,c(25,22)]
 #print first 10 rows,Contacts, techie and churn column
@@ -270,7 +211,7 @@ df_Yearly_equip_failure_sort <- df[order(-df$Yearly_equip_failure_zScore),]
 #print head of df_Yearly_equip_failure_sort
 head(df_Yearly_equip_failure_sort)
 #print first 94 rows
-df_Yearly_equip_failure_sort[1:94,c(1,65)]
+df_Yearly_equip_failure_sort[1:94,c(1,62)]
 #print first 10 rows, Yearly_equip_failure and churn column
 df_Yearly_equip_failure_sort[1:10,c(26,22)]
 #print first 10 rows,Yearly_equip_failure, techie and churn column
@@ -289,7 +230,7 @@ df_Tenure_sort <- df[order(-df$Tenure_zScore),]
 #print head of df_Tenure_sort
 head(df_Tenure_sort)
 #print first 10 rows
-df_Tenure_sort[1:10,c(1,66)]
+df_Tenure_sort[1:10,c(1,63)]
 #print first 10 rows, Tenure and churn column
 df_Tenure_sort[1:10,c(42,22)]
 #print first 10 rows,Tenure, techie and churn column
@@ -308,7 +249,7 @@ df_MonthlyCharge_sort <- df[order(-df$MonthlyCharge_zScore),]
 #print head of df_MonthlyCharge_sort
 head(df_MonthlyCharge_sort)
 #print first 3 rows
-df_MonthlyCharge_sort[1:3,c(1,67)]
+df_MonthlyCharge_sort[1:3,c(1,64)]
 #print first 10 rows, MonthlyCharge and churn column
 df_MonthlyCharge_sort[1:10,c(43,22)]
 #print first 10 rows,MonthlyCharge, techie and churn column
@@ -327,177 +268,14 @@ df_Bandwidth_GB_Year_sort <- df[order(-df$Bandwidth_GB_Year_zScore),]
 #print head of df_Bandwidth_GB_Year_sort
 head(df_Bandwidth_GB_Year_sort)
 #print first 10 rows
-df_Bandwidth_GB_Year_sort[1:10,c(1,68)]
+df_Bandwidth_GB_Year_sort[1:10,c(1,65)]
 #print first 10 rows, Bandwidth_GB_Year and churn column
 df_Bandwidth_GB_Year_sort[1:10,c(44,22)]
 #print first 10 rows,Bandwidth_GB_Year, techie and churn column
 df_Bandwidth_GB_Year_sort[1:20,c(44,22,27)]
 #check for null/missing zscores
 sum(is.na(df$Bandwidth_GB_Year_zScore))
-#z score for item1 
-df$item1_zScore <- scale(x=df$item1)
-#identify outliers using zscore
-item1_outliers <- df[which(df$item1_zScore < -3 | df$item1_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item1_outliers) #output = 19
-print(num_of_outliers)
-#sort data by item1 outliers
-df_item1_sort <- df[order(-df$item1_zScore),]
-#print head of df_item1_sort
-head(df_item1_sort)
-#print first 10 rows
-df_item1_sort[1:19,c(1,69)]
-#print first 10 rows, item1 and churn column
-df_item1_sort[1:10,c(45,22)]
-#print first 10 rows,item1, techie and churn column
-df_item1_sort[1:20,c(45,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item1_zScore))
-#z score for item2 
-df$item2_zScore <- scale(x=df$item2)
-#identify item2 outliers using zscore
-item2_outliers <- df[which(df$item2_zScore < -3 | df$item2_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item2_outliers) #output = 13
-print(num_of_outliers)
-#sort data by item2 outliers
-df_item2_sort <- df[order(-df$item2_zScore),]
-#print head of df_item2_sort
-head(df_item2_sort)
-#print first 13 rows
-df_item2_sort[1:13,c(1,70)]
-#print first 10 rows, item2 and churn column
-df_item2_sort[1:10,c(46,22)]
-#print first 10 rows,item2, techie and churn column
-df_item2_sort[1:20,c(46,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item2_zScore))
-#z score for item3 
-df$item3_zScore <- scale(x=df$item3)
-#identify item3 outliers using zscore
-item3_outliers <- df[which(df$item3_zScore < -3 | df$item3_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item3_outliers) #output = 13
-print(num_of_outliers)
-#sort data by item3 outliers
-df_item3_sort <- df[order(-df$item3_zScore),]
-#print head of df_item3_sort
-head(df_item3_sort)
-#print first 10 rows
-df_item3_sort[1:13,c(1,71)]
-#print first 10 rows, item3 and churn column
-df_item3_sort[1:10,c(47,22)]
-#print first 10 rows,item3, techie and churn column
-df_item3_sort[1:20,c(47,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item3_zScore))
-#z score for item4 
-df$item4_zScore <- scale(x=df$item4)
-#identify item4 outliers using zscore
-item4_outliers <- df[which(df$item4_zScore < -3 | df$item4_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item4_outliers) #output = 9
-print(num_of_outliers)
-#sort data by item4 outliers
-df_item4_sort <- df[order(-df$item4_zScore),]
-#print head of df_item4_sort
-head(df_item4_sort)
-#print first 9 rows
-df_item4_sort[1:9,c(1,72)]
-#print first 10 rows, item4 and churn column
-df_item4_sort[1:10,c(48,22)]
-#print first 10 rows,item4, techie and churn column
-df_item4_sort[1:20,c(48,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item4_zScore))
-#z score for item5 
-df$item5_zScore <- scale(x=df$item5)
-#identify item5 outliers using zscore
-item5_outliers <- df[which(df$item5_zScore < -3 | df$item5_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item5_outliers) #output = 12
-print(num_of_outliers)
-#sort data by item5 outliers
-df_item5_sort <- df[order(-df$item5_zScore),]
-#print head of df_item5_sort
-head(df_item5_sort)
-#print first 10 rows
-df_item5_sort[1:12,c(1,73)]
-#print first 10 rows, item5 and churn column
-df_item5_sort[1:10,c(49,22)]
-#print first 10 rows,item5, techie and churn column
-df_item5_sort[1:20,c(49,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item5_zScore))
-#z score for item6 
-df$item6_zScore <- scale(x=df$item6)
-#identify item6 outliers using zscore
-item6_outliers <- df[which(df$item6_zScore < -3 | df$item6_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item6_outliers) #output = 13
-print(num_of_outliers)
-#sort data by item6 outliers
-df_item6_sort <- df[order(-df$item6_zScore),]
-#print head of df_item6_sort
-head(df_item6_sort)
-#print first 10 rows
-df_item6_sort[1:13, c(1,74)]
-#print first 10 rows, item6 and churn column
-df_item6_sort[1:10,c(50,22)]
-#print first 10 rows,item6, techie and churn column
-df_item6_sort[1:20,c(50,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item6_zScore))
-#z score for item7
-df$item7_zScore <- scale(x=df$item7)
-#identify item7 outliers using zscore
-item7_outliers <- df[which(df$item7_zScore < -3 | df$item7_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item7_outliers) #output = 11
-print(num_of_outliers)
-#sort data by item7 outliers
-df_item7_sort <- df[order(-df$item7_zScore),]
-#print head of df_item1_sort
-head(df_item7_sort)
-#print first 11 rows
-df_item7_sort[1:11,c(1,75)]
-#print first 10 rows, item7 and churn column
-df_item7_sort[1:10,c(51,22)]
-#print first 10 rows,item7, techie and churn column
-df_item7_sort[1:20,c(51,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item7_zScore))
-#z score for item8 
-df$item8_zScore <- scale(x=df$item8)
-#identify item8 outliers using zscore
-item8_outliers <- df[which(df$item8_zScore < -3 | df$item8_zScore > 3),]
-#calculate quantity of outliers  
-num_of_outliers <- nrow(item8_outliers) #output = 15
-print(num_of_outliers)
-#sort data by item8 outliers
-df_item8_sort <- df[order(-df$item8_zScore),]
-#print head of df_item8_sort
-head(df_item8_sort)
-#print first 15 rows
-df_item8_sort[1:15,c(1,76)]
-#print first 10 rows, item8 and churn column
-df_item8_sort[1:10,c(52,22)]
-#print first 10 rows,item8, techie and churn column
-df_item8_sort[1:20,c(52,22,27)]
-#check for null/missing zscores
-sum(is.na(df$item8_zScore))
-#label columns in case the default labels didn’t work
-colnames(df) = c("X",	"CaseOrder",	"Customer_id"	,"Interaction",	"City",	"State",	"County",	"Zip"	,"Lat",	"Lng"	,
-                 "Population"	,"Area"	,"Timezone",	"Job"	,"Children"	,"Age",	"Education"	,"Employment"	,"Income"	,
-                 "Marital"	,"Gender",	"Churn"	,"Outage_sec_perweek",	"Email",	"Contacts",	"Yearly_equip_failure",	
-                 "Techie"	,"Contract",	"Port_modem",	"Tablet"	,"InternetService",	"Phone"	,"Multiple",	"OnlineSecurity",	
-                 "OnlineBackup"	,"DeviceProtection"	,"TechSupport"	,"StreamingTV"	,"StreamingMovies"	,"PaperlessBilling",
-                 "PaymentMethod",	"Tenure"	,"MonthlyCharge"	,"Bandwidth_GB_Year",	"item1"	,"item2"	,"item3"	,"item4"	,"item5"	,"item6",	"item7",	"item8",	
-                 "X_zScore"	,"CaseOrder_zScore",	"Zip_zScore"	,"Lat_zScore"	,"Lng_zScore",	"Population_zScore"	,"Children_zScore"	,
-                 "Age_zScore"	,"Income_zScore",	"Outage_sec_perweek_zScore",	"Email_zScore",	"Contacts_zScore"	,
-                 "Yearly_equip_failure_zScore",	"Tenure_zScore",	"MonthlyCharge_zScore",	"Bandwidth_GB_Year_zScore",	"item1_zScore",
-                 "item2_zScore"	,"item3_zScore"	,"item4_zScore"	,"item5_zScore"	,
-                 "item6_zScore"	,"item7_zScore"	,"item8_zScore") 
+
 
 #install corrplot so we can check correlations between churn and variables
 #library(corrplot)
@@ -654,9 +432,6 @@ df[,"item5"]<- as.integer(df[,"item5"])
 df[,"item6"]<- as.integer(df[,"item6"])
 df[,"item7"]<- as.integer(df[,"item7"])
 df[,"item8"]<- as.integer(df[,"item8"])
-df[,"X_zScore"] <- as.numeric(df[,"X_zScore"])
-df[,"CaseOrder_zScore"] <- as.numeric(df[,"CaseOrder_zScore"])
-df[,"Zip_zScore"] <- as.numeric(df[,"Zip_zScore"])
 df[,"Lat_zScore"] <- as.numeric(df[,"Lat_zScore"])
 df[,"Lng_zScore"] <- as.numeric(df[,"Lng_zScore"])
 df[,"Population_zScore"] <- as.numeric(df[,"Population_zScore"])
@@ -670,19 +445,8 @@ df[,"Yearly_equip_failure_zScore"] <- as.numeric(df[,"Yearly_equip_failure_zScor
 df[,"Tenure_zScore"] <- as.numeric(df[,"Tenure_zScore"])
 df[,"MonthlyCharge_zScore"] <- as.numeric(df[,"MonthlyCharge_zScore"])
 df[,"Bandwidth_GB_Year_zScore"] <- as.numeric(df[,"Bandwidth_GB_Year_zScore"])
-df[,"item1_zScore"] <- as.numeric(df[,"item1_zScore"])
-df[,"item2_zScore"] <- as.numeric(df[,"item2_zScore"])
-df[,"item3_zScore"] <- as.numeric(df[,"item3_zScore"])
-df[,"item4_zScore"] <- as.numeric(df[,"item4_zScore"])
-df[,"item5_zScore"] <- as.numeric(df[,"item5_zScore"])
-df[,"item6_zScore"] <- as.numeric(df[,"item6_zScore"])
-df[,"item7_zScore"] <- as.numeric(df[,"item7_zScore"])
-df[,"item8_zScore"] <- as.numeric(df[,"item8_zScore"])
-
-
 write.csv(df, "churn_data_clean.csv", row.names = FALSE)
-# use dplyr to drop col Age_zScore due to error
-#df <-select(df, -Age_zScore)
+
 summary(df)
 #initialize data for pca analysis
 
