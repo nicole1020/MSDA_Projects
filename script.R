@@ -503,7 +503,7 @@ colnames(df) = c("X",	"CaseOrder",	"Customer_id"	,"Interaction",	"City",	"State"
 #library(corrplot)
 #install.packages("corrplot")
 #create corrplot of all numeric variables in data frame
-#df_numeric <- df[sapply(df, is.numeric)]
+df_numeric <- df[sapply(df, is.numeric)]
 # Add the Churns variable
 #df_numeric$Churns <- as.numeric(as.factor(df$Churn)) 
 #create cor table
@@ -685,47 +685,60 @@ write.csv(df, "churn_data_clean.csv", row.names = FALSE)
 #df <-select(df, -Age_zScore)
 summary(df)
 #initialize data for pca analysis
+
 # initialize variables y,X,X_test (X and X_test split df in half)
 #columns/variables used are quantitative and continuous
-y <- df$Churn
-X <- df[1:5000,c(9,10, 19, 23, 42:44)]
-X_test <- df[5001:10000,c(9,10, 19, 23, 42:44)]
-
+#y <- df$Churn
+#X <- df[1:5000,c(9,10, 19, 23, 42:44)]
+#X_test <- df[5001:10000,c(9,10, 19, 23, 42:44)]
 #standardize predictor vars
-X_z <- as.data.frame(scale(X))
-colnames(X_z) <- c("Lat", "Lng", "Income", "Outage_sec_perweek", "Tenure", "MonthlyCharge", "Bandwidth_GB_Year")
-round(cor(X_z), 3)
+#X_z <- as.data.frame(scale(X))
+#colnames(X_z) <- c("Lat", "Lng", "Income", "Outage_sec_perweek", "Tenure", "MonthlyCharge", "Bandwidth_GB_Year")
+#round(cor(X_z), 3)
 #install.packages("psych")
-library(psych)
+#library(psych)
 #conduct pca- result K=6
-pca1 <- principal(r=X_z, rotate ="varimax", nfactors=7)
+#pca1 <- principal(r=X_z, rotate ="varimax", nfactors=7)
 ##component weights
-print(pca1$loadings, cutoff= .49)
+#print(pca1$loadings, cutoff= .49)
 #convert ss load results to vectors to plot
-ss_load <- c(1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.999)
+#ss_load <- c(1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.999)
 #eigenvalues screeplot
-plot(ss_load, type="b", main = "Plot of Eigenvalues (scree plot)", ylab = "Value", xlab= "Component"); abline(h=1, lty=2)
-
+#plot(ss_load, type="b", main = "Plot of Eigenvalues (scree plot)", ylab = "Value", xlab= "Component"); abline(h=1, lty=2)
 #without rotation- result K=4 
-pca2_no_rotation <-principal(r=X, rotate="none", nfactors=6)
+#pca2_no_rotation <-principal(r=X, rotate="none", nfactors=6)
 #component weights
-print(pca2_no_rotation$loadings,cutoff=.5)
-
+#print(pca2_no_rotation$loadings,cutoff=.5)
 #with rotation- result K=5 
-pca2_rotation<-principal(r=X, rotate="varimax", nfactors=6)
+#pca2_rotation<-principal(r=X, rotate="varimax", nfactors=6)
 #component weights
-print(pca2_rotation$loadings,cutoff=.5)
-
+#print(pca2_rotation$loadings,cutoff=.5)
 #confirm pca results
-X_test_z <- scale(X_test)
+#X_test_z <- scale(X_test)
 #confirm 6 PCA components recommended K=6
-pca2_test <- principal(r=X_test_z, rotate="varimax", nfactors=7)
+#pca2_test <- principal(r=X_test_z, rotate="varimax", nfactors=7)
 #component weights
-pca2_test$loadings
+#pca2_test$loadings
 #confirmed 6 components (K=6)
 #correlation of components in training set
 #shows components not correlated below
-round(cor(pca2_rotation$scores), 2)
+#round(cor(pca2_rotation$scores), 2)
+
+summary(df)
+
+#initialize pca
+#select rows and specific columns and run pca
+df.pca <- prcomp(df[,c(9,10, 19, 23, 42:44)], center=TRUE, scale=TRUE)
+#summary of pca output
+summary(df.pca)
+#install.packages("factoextra")
+library(factoextra)
+
+#loadings matrix
+df.pca$rotation
+
+#scree plot of eigenvalues to indicate number of PCs in the PCA "Principal Component Analysis"
+fviz_eig(df.pca, choice = "eigenvalue", addlabels=TRUE)
 
 
 
