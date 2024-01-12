@@ -503,7 +503,7 @@ colnames(df) = c("X",	"CaseOrder",	"Customer_id"	,"Interaction",	"City",	"State"
 #library(corrplot)
 #install.packages("corrplot")
 #create corrplot of all numeric variables in data frame
-df_numeric <- df[sapply(df, is.numeric)]
+#df_numeric <- df[sapply(df, is.numeric)]
 # Add the Churns variable
 #df_numeric$Churns <- as.numeric(as.factor(df$Churn)) 
 #create cor table
@@ -519,14 +519,14 @@ hist(df$Children,xlab="children", main = "Histogram of children")
 #histogram for Outage_sec_perweek
 hist(df$Outage_sec_perweek, xlab="Outage_sec_perweek", main = "Histogram of Outage_sec_perweek")
 #histogram for Techie (1 is no 2 is yes) convert to numeric from char
-df_numeric$Techie <- as.numeric(as.factor(df$Techie)) 
-hist(df_numeric$Techie, xlab="Techie", main = "Histogram of Techie")
+df$Techie <- as.numeric(as.factor(df$Techie)) 
+hist(df$Techie, xlab="Techie", main = "Histogram of Techie")
 #histogram for Phone convert to numeric (1 is no 2 is yes)
-df_numeric$Phone <- as.numeric(as.factor(df$Phone)) 
-hist(df_numeric$Phone, xlab="Phone", main = "Histogram of Phone")
+df$Phone <- as.numeric(as.factor(df$Phone)) 
+hist(df$Phone, xlab="Phone", main = "Histogram of Phone")
 #histogram for TechSupport convert to numeric (1 is no 2 is yes)
-df_numeric$TechSupport <- as.numeric(as.factor(df$TechSupport)) 
-hist(df_numeric$TechSupport, xlab="TechSupport", main = "Histogram of TechSupport")
+df$TechSupport <- as.numeric(as.factor(df$TechSupport)) 
+hist(df$TechSupport, xlab="TechSupport", main = "Histogram of TechSupport")
 #histogram for Bandwidth_GB_Year
 hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
 #histogram for Tenure
@@ -590,12 +590,12 @@ hist(df$Children,xlab="children", main = "Histogram of children")
 df$Outage_sec_perweek <- as.numeric(as.character(df$Outage_sec_perweek))
 hist(df$Outage_sec_perweek, xlab="Outage_sec_perweek", main = "Histogram of Outage_sec_perweek")
 #histogram for Techie (1 is no 2 is yes) convert to numeric from char
-hist(df_numeric$Techie, xlab="Techie", main = "Histogram of Techie")
+hist(df$Techie, xlab="Techie", main = "Histogram of Techie")
 #histogram for Phone convert to numeric (1 is no 2 is yes)
-hist(df_numeric$Phone, xlab="Phone", main = "Histogram of Phone")
+hist(df$Phone, xlab="Phone", main = "Histogram of Phone")
 #histogram for TechSupport convert to numeric (1 is no 2 is yes)
-#df_numeric$TechSupport <- as.numeric(as.factor(df$TechSupport)) 
-hist(df_numeric$TechSupport, xlab="TechSupport", main = "Histogram of TechSupport")
+df$TechSupport <- as.numeric(as.factor(df$TechSupport)) 
+hist(df$TechSupport, xlab="TechSupport", main = "Histogram of TechSupport")
 #histogram for Bandwidth_GB_Year
 hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
 #histogram for Tenure
