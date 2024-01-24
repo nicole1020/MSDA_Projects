@@ -14,8 +14,8 @@ colSums(is.na(df))
 rowSums(is.na(df))
 #check dimensions of data frame
 dim(df)
-df[,'item1']
-is.na(df[,'Age'])
+#check for duplicate data
+df[duplicated(df) | duplicated(df, fromLast = TRUE), ]
 #install ggplot2 for data visualization
 #install.packages("ggplot2")
 library(ggplot2)
@@ -88,14 +88,14 @@ df$Children_zScore <- scale(x=df$Children)
 #identify outliers using zscore
 Children_outliers <- df[which(df$Children_zScore < -3 | df$Children_zScore > 3),]
 #calculate quantity of outliers 
-num_of_outliers <- nrow(Children_outliers) #output = 302
+num_of_outliers <- nrow(Children_outliers) #output = 144
 print(num_of_outliers)
 #sort data by Children outliers
 df_Children_sort <- df[order(-df$Children_zScore),]
 #print head of df_Children_sort
 head(df_Children_sort)
-#print first 10 rows 302 col 56
-df_Children_sort[1:302,c(1,56)]
+#print first 10 rows 144 col 56
+df_Children_sort[1:144,c(1,56)]
 #print first 10 rows, Children and churn column
 df_Children_sort[1:10,c(15,22)]
 #print first 10 rows,Children, techie and churn column
@@ -126,14 +126,14 @@ df$Income_zScore <- scale(x=df$Income)
 #identify Income outliers using zscore
 Income_outliers <- df[which(df$Income_zScore < -3 | df$Income_zScore > 3),]
 #calculate quantity of outliers 
-num_of_outliers <- nrow(Income_outliers) #output = reality 180
+num_of_outliers <- nrow(Income_outliers) #output =  110
 print(num_of_outliers)
 #sort data by age outliers
 df_Income_sort <- df[order(-df$Income_zScore),]
 #print head of df_Income_sort
 head(df_Income_sort)
-#print first 110 rows and last 70
-df_Income_sort[1:180,c(1,58)]
+#print first 180
+df_Income_sort[1:110,c(1,58)]
 # df_Income_sort[9705:10000,61]
 #print first 10 rows, Income and churn column
 df_Income_sort[1:10,c(19,22)]
@@ -171,7 +171,7 @@ print(num_of_outliers)
 df_Email_sort <- df[order(-df$Email_zScore),]
 #print head of df_Email_sort
 head(df_Email_sort)
-#print 12 rows with outliers
+#print first 3 rows and last 9 rows with outliers
 df_Email_sort[1:3,c(1,60)]
 df_Email_sort[9992:10000,60]
 #print first 10 rows, Email and churn column
@@ -276,26 +276,13 @@ df_Bandwidth_GB_Year_sort[1:20,c(44,22,27)]
 #check for null/missing zscores
 sum(is.na(df$Bandwidth_GB_Year_zScore))
 
-
-#install corrplot so we can check correlations between churn and variables
-#library(corrplot)
-#install.packages("corrplot")
-#create corrplot of all numeric variables in data frame
-#df_numeric <- df[sapply(df, is.numeric)]
-# Add the Churns variable
-#df_numeric$Churns <- as.numeric(as.factor(df$Churn)) 
-#create cor table
-#cor.table <- cor(df_numeric)
-#create corrplot
-#corrplot(cor.table, method = "color", tl.cex = 0.6, tl.srt = 45)
+#Histogram for all variables with missing values
 #histogram of Age
 hist(df$Age,xlab="age", main = "Histogram of age")
 #histogram of Income
 hist(df$Income, xlab="Income", main= "Histogram on Income")
 #histogram for Children
 hist(df$Children,xlab="children", main = "Histogram of children")
-#histogram for Outage_sec_perweek
-hist(df$Outage_sec_perweek, xlab="Outage_sec_perweek", main = "Histogram of Outage_sec_perweek")
 #histogram for Techie (1 is no 2 is yes) convert to numeric from char
 df$Techie <- as.numeric(as.factor(df$Techie)) 
 hist(df$Techie, xlab="Techie", main = "Histogram of Techie")
@@ -310,69 +297,61 @@ hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwi
 #histogram for Tenure
 hist(df$Tenure, xlab="Tenure", main = "Histogram of Tenure")
 
-
-#replace NA values in col Age - avg
-
+#impute and replace NA values in all columns with NA values
+#impute age- numeric not skewed- impute mean
 df$Age[is.na(df$Age)] <- round(mean(df$Age, na.rm=TRUE))
 #confirm replace age NA with mean
 sum(is.na(df$Age))
-#replace NA Values in col Income- AVG negative skew normal distribution
-df$Income[is.na(df$Income)] <- mean(df$Income, na.rm=TRUE)
+#replace NA Values in col Income- AVG negative skew normal distribution with skew and numeric impute median
+df$Income[is.na(df$Income)] <- median(df$Income, na.rm=TRUE)
+#confirm replace Income NA with median 
 sum(is.na(df$Income))
-#replace NA values in col Children - normal distribution will use mode "0"
-df[,"Children"]<- as.numeric(df[,"Children"])
-df$Children[is.na(df$Children)] <- 0
-#confirm replace Children NA with mode 
+#replace NA values in col Children - distribution negative skew and numeric data  will use median 
+df$Children[is.na(df$Children)] <- median(df$Children, na.rm=TRUE)
+#confirm replace Children NA with median 
 sum(is.na(df$Children))
-#replace NA values in col Outage_sec_perweek - negative skew bimodal distribution will use mode
-df$Outage_sec_perweek[is.na(df$Outage_sec_perweek)] <- mode(df$Outage_sec_perweek)
-#confirm replace Outage_sec_perweek NA with mode 
-sum(is.na(df$Outage_sec_perweek))
-#replace NA values in col Techie - negative skew distribution will use mode "1" for No. hardcode value since using mode resulted in new column added to histogram. 
+#replace NA values in col Techie - negative skew distribution, but categorical string variable will use mode "1" for No. hardcode value since using mode resulted in new column added to histogram. 
 #converting to numeric here to impute values - otherwise major errors occurred with data type inconsistancies
 df[,"Techie"]<- as.numeric(df[,"Techie"])
 df$Techie[is.na(df$Techie)] <- 1
 #confirm replace Techie NA with mode 
 sum(is.na(df$Techie))
-#replace NA values in col Phone - positive skew distribution will use mode. Hardcoded value since using mode resulted in new column added to histogram. 
+#replace NA values in col Phone - positive skew distribution but categorical string variable will use mode. Hardcoded value since using mode resulted in new column added to histogram. 
 #converting to numeric here to impute values - otherwise major errors occurred with data type inconsistencies
 df[,"Phone"]<- as.numeric(df[,"Phone"])
 df$Phone[is.na(df$Phone)] <- 2
 #confirm replace Phone NA with mode 
 sum(is.na(df$Phone))
-#replace NA values in col TechSupport - negative skew distribution will use mode. Hardcoded value since using mode resulted in new column added to histogram. 
+#replace NA values in col TechSupport - negative skew distribution but categorical string variable will use mode. Hardcoded value since using mode resulted in new column added to histogram. 
 #converting to numeric here to impute values - otherwise major errors occurred with data type inconsistencies
 df[,"TechSupport"]<- as.numeric(df[,"TechSupport"])
 df$TechSupport[is.na(df$TechSupport)] <- 1
 #confirm replace TechSupport NA with mode 
 sum(is.na(df$TechSupport))
-#replace NA values in col Bandwidth_GB_Year - has bimodal distribution- will use average
-df$Bandwidth_GB_Year[is.na(df$Bandwidth_GB_Year)] <- mean(df$Bandwidth_GB_Year, na.rm=TRUE)
+#replace NA values in col Tenure -has bimodal distribution- will use median
+df$Tenure[is.na(df$Tenure)] <- median(df$Tenure , na.rm=TRUE)
+#confirm replace Tenure NA with median
+sum(is.na(df$Tenure))
+#replace NA values in col Bandwidth_GB_Year - has bimodal distribution- will use median
+df$Bandwidth_GB_Year[is.na(df$Bandwidth_GB_Year)] <- median(df$Bandwidth_GB_Year, na.rm=TRUE)
 #confirm replace Bandwidth_GB_Year NA with mean
 sum(is.na(df$Bandwidth_GB_Year))
-#replace NA values in col Tenure -has bimodal distribution- will use average
-df$Tenure[is.na(df$Tenure)] <- mean(df$Tenure , na.rm=TRUE)
-#confirm replace Tenure NA with mean
-sum(is.na(df$Tenure))
 
-# recheck histograms after changes made
+#check for null values
+colSums(is.na(df))
+
+# recheck histograms to confirm imputed NA values after changes made
 #histogram of Age
 hist(df$Age,xlab="age", main = "Histogram of age")
 #histogram of Income
 hist(df$Income, xlab="Income", main= "Histogram on Income")
 #histogram for Children
-#update datatype as error thrown for data type issue- needed to be numeric
 hist(df$Children,xlab="children", main = "Histogram of children")
-#histogram for Outage_sec_perweek
-#update datatype as error thrown for data type issue- needed to be numeric
-df$Outage_sec_perweek <- as.numeric(as.character(df$Outage_sec_perweek))
-hist(df$Outage_sec_perweek, xlab="Outage_sec_perweek", main = "Histogram of Outage_sec_perweek")
 #histogram for Techie (1 is no 2 is yes) convert to numeric from char
 hist(df$Techie, xlab="Techie", main = "Histogram of Techie")
 #histogram for Phone convert to numeric (1 is no 2 is yes)
 hist(df$Phone, xlab="Phone", main = "Histogram of Phone")
 #histogram for TechSupport convert to numeric (1 is no 2 is yes)
-df$TechSupport <- as.numeric(as.factor(df$TechSupport)) 
 hist(df$TechSupport, xlab="TechSupport", main = "Histogram of TechSupport")
 #histogram for Bandwidth_GB_Year
 hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
@@ -448,49 +427,8 @@ df[,"Bandwidth_GB_Year_zScore"] <- as.numeric(df[,"Bandwidth_GB_Year_zScore"])
 write.csv(df, "churn_data_clean.csv", row.names = FALSE)
 
 summary(df)
+
 #initialize data for pca analysis
-
-# initialize variables y,X,X_test (X and X_test split df in half)
-#columns/variables used are quantitative and continuous
-#y <- df$Churn
-#X <- df[1:5000,c(9,10, 19, 23, 42:44)]
-#X_test <- df[5001:10000,c(9,10, 19, 23, 42:44)]
-#standardize predictor vars
-#X_z <- as.data.frame(scale(X))
-#colnames(X_z) <- c("Lat", "Lng", "Income", "Outage_sec_perweek", "Tenure", "MonthlyCharge", "Bandwidth_GB_Year")
-#round(cor(X_z), 3)
-#install.packages("psych")
-#library(psych)
-#conduct pca- result K=6
-#pca1 <- principal(r=X_z, rotate ="varimax", nfactors=7)
-##component weights
-#print(pca1$loadings, cutoff= .49)
-#convert ss load results to vectors to plot
-#ss_load <- c(1.000, 1.000, 1.000, 1.000, 1.000, 1.000, 0.999)
-#eigenvalues screeplot
-#plot(ss_load, type="b", main = "Plot of Eigenvalues (scree plot)", ylab = "Value", xlab= "Component"); abline(h=1, lty=2)
-#without rotation- result K=4 
-#pca2_no_rotation <-principal(r=X, rotate="none", nfactors=6)
-#component weights
-#print(pca2_no_rotation$loadings,cutoff=.5)
-#with rotation- result K=5 
-#pca2_rotation<-principal(r=X, rotate="varimax", nfactors=6)
-#component weights
-#print(pca2_rotation$loadings,cutoff=.5)
-#confirm pca results
-#X_test_z <- scale(X_test)
-#confirm 6 PCA components recommended K=6
-#pca2_test <- principal(r=X_test_z, rotate="varimax", nfactors=7)
-#component weights
-#pca2_test$loadings
-#confirmed 6 components (K=6)
-#correlation of components in training set
-#shows components not correlated below
-#round(cor(pca2_rotation$scores), 2)
-
-summary(df)
-
-#initialize pca
 #select rows and specific columns and run pca
 df.pca <- prcomp(df[,c(9,10, 19, 23, 42:44)], center=TRUE, scale=TRUE)
 #summary of pca output
@@ -503,6 +441,5 @@ df.pca$rotation
 
 #scree plot of eigenvalues to indicate number of PCs in the PCA "Principal Component Analysis"
 fviz_eig(df.pca, choice = "eigenvalue", addlabels=TRUE)
-
 
 
