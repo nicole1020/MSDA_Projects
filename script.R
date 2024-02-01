@@ -429,8 +429,9 @@ write.csv(df, "churn_data_clean.csv", row.names = FALSE)
 summary(df)
 
 #initialize data for pca analysis
-#select rows and specific columns and run pca
-df.pca <- prcomp(df[,c(9,10, 19, 23, 42:44)], center=TRUE, scale=TRUE)
+#select specific columns and run pca
+# Lat, Lng, Income, Outage_sec_perweek, Tenure, MonthlyCharge, Bandwidth_GB_Year.
+df.pca <- prcomp(df[,c(9,10, 19, 23, 42, 43, 44)], center=TRUE, scale=TRUE)
 #summary of pca output
 summary(df.pca)
 #install.packages("factoextra")
