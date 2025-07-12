@@ -1,0 +1,896 @@
+
+
+
+#install ggplot2 for data visualization
+#install.packages("ggplot2")
+library(ggplot2)
+#install dplyr for data manipulation
+#install.packages("dplyr")
+library(dplyr)
+#load necessary packages
+#install.packages("lattice")
+library(lattice)
+#install.packages("caret")
+library(caret)
+#install.packages("cvms")
+library(cvms)
+library(corrplot)
+#install.packages("ConfusionTableR")
+library(ConfusionTableR)
+library(tidyverse)
+library(psych)
+#install.packages("tidyr")
+library(tidyr)
+
+#get working directory
+getwd()
+#set wd to ensure working directory is in this file loc
+setwd("C:/Users/Administrator.NDESKTOP/d206-churn.dictionary.files")
+#create df using churn_raw_data.csv
+df <- read.csv("churn_raw_data.csv")
+#check data types using structure function
+str(df)
+#check null values
+sum(is.na(df))
+# check null cols
+colSums(is.na(df))
+#check null values by row
+rowSums(is.na(df))
+#check dimensions of data frame
+dim(df)
+#check for duplicate data
+df[duplicated(df) | duplicated(df, fromLast = TRUE), ]
+
+
+#calculate outliers for all quantitative variables
+#z score for Lat 
+df$Lat_zScore <- scale(x=df$Lat)
+#identify Lat outliers using zscore
+Lat_outliers <- df[which(df$Lat_zScore < -3 | df$Lat_zScore > 3),]
+#calculate quantity of outliers 
+num_of_outliers <- nrow(Lat_outliers) #output = 151
+print(num_of_outliers)
+#sort data by Lat outliers
+df_Lat_sort <- df[order(-df$Lat_zScore),]
+#print head of df_Lat_sort
+head(df_Lat_sort)
+summary(df_Lat_sort)
+#print first 76 rows and last 76 rows in col 53 for Lat_zScore
+df_Lat_sort[1:76,c(1,53)]
+df_Lat_sort[9926:10000,c(1,53)]
+#print first 10 rows, Lat and churn column
+df_Lat_sort[1:10,c(9,53)]
+#print first 10 rows,Lat, techie and churn column
+df_Lat_sort[1:20,c(9,22,53)]
+#check for null/missing zscores
+sum(is.na(df$Lat_zScore))
+#z score for Lng 
+df$Lng_zScore <- scale(x=df$Lng)
+#identify Lng outliers using zscore
+Lng_outliers <- df[which(df$Lng_zScore < -3 | df$Lng_zScore > 3),]
+#calculate quantity of outliers 
+num_of_outliers <- nrow(Lng_outliers) #output = 102
+print(num_of_outliers)
+#sort data by Lng outliers
+df_Lng_sort <- df[order(-df$Lng_zScore),]
+#print head of df_Lng_sort
+head(df_Lng_sort)
+#print first and last 102 rows in col 54 for Lng_zScore
+df_Lng_sort[9899:10000,c(1,54)]
+#print first 10 rows, Lng and churn column
+df_Lng_sort[1:10,c(10,22)]
+#print first 10 rows,Lng, techie and churn column
+df_Lng_sort[1:20,c(10,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Lng_zScore))
+#z score for Children 
+df$Children_zScore <- scale(x=df$Children)
+#identify outliers using zscore
+Children_outliers <- df[which(df$Children_zScore < -3 | df$Children_zScore > 3),]
+#calculate quantity of outliers 
+num_of_outliers <- nrow(Children_outliers) #output = 144
+print(num_of_outliers)
+#sort data by Children outliers
+df_Children_sort <- df[order(-df$Children_zScore),]
+#print head of df_Children_sort
+head(df_Children_sort)
+#check for null/missing zscores
+sum(is.na(df$Children_zScore))
+#z score for age 
+df$Age_zScore <- scale(x=df$Age)
+#identify outliers using zscore
+age_outliers <- df[which(df$Age_zScore < -3 | df$Age_zScore > 3),]
+#calculate quantity of outliers 
+num_of_outliers <- nrow(age_outliers) #output = 0
+print(num_of_outliers)
+#sort data by age outliers
+df_age_sort <- df[order(-df$Age_zScore),]
+#print head of df_age_sort
+head(df_age_sort)
+
+#check for null/missing zscores
+sum(is.na(df$Age_zScore)) #check this
+#z score for Income 
+df$Income_zScore <- scale(x=df$Income)
+#identify Income outliers using zscore
+Income_outliers <- df[which(df$Income_zScore < -3 | df$Income_zScore > 3),]
+#calculate quantity of outliers 
+num_of_outliers <- nrow(Income_outliers) #output =  110
+print(num_of_outliers)
+#sort data by age outliers
+df_Income_sort <- df[order(-df$Income_zScore),]
+#print head of df_Income_sort
+head(df_Income_sort)
+#print first 180
+#df_Income_sort[1:110,c(1,58)]
+# df_Income_sort[9705:10000,61]
+#print first 10 rows, Income and churn column
+#df_Income_sort[1:10,c(19,22)]
+#print first 10 rows,Income, techie and churn column
+#df_Income_sort[1:20,c(19,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Income_zScore))
+
+#z score for Contacts 
+df$Contacts_zScore <- scale(x=df$Contacts)
+#identify Contacts outliers using zscore
+Contacts_outliers <- df[which(df$Contacts_zScore < -3 | df$Contacts_zScore > 3),]
+#calculate quantity of outliers  
+num_of_outliers <- nrow(Contacts_outliers) #output = 165
+print(num_of_outliers)
+#sort data by Contacts outliers
+df_Contacts_sort <- df[order(-df$Contacts_zScore),]
+#print head of df_Contacts_sort
+head(df_Contacts_sort)
+#print first 165 rows
+#df_Contacts_sort[1:165,c(1,61)]
+#print first 10 rows, Contacts and churn column
+#df_Contacts_sort[1:10,c(25,22)]
+#print first 10 rows,Contacts, techie and churn column
+#df_Contacts_sort[1:20,c(25,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Contacts_zScore))
+#z score for Yearly_equip_failure 
+df$Yearly_equip_failure_zScore <- scale(x=df$Yearly_equip_failure)
+#identify Yearly_equip_failure outliers using zscore
+Yearly_equip_failure_outliers <- df[which(df$Yearly_equip_failure_zScore < -3 | df$Yearly_equip_failure_zScore > 3),]
+#calculate quantity of outliers  
+num_of_outliers <- nrow(Yearly_equip_failure_outliers) #output = 94
+print(num_of_outliers)
+#sort data by Yearly_equip_failure outliers
+df_Yearly_equip_failure_sort <- df[order(-df$Yearly_equip_failure_zScore),]
+#print head of df_Yearly_equip_failure_sort
+head(df_Yearly_equip_failure_sort)
+#print first 94 rows
+#df_Yearly_equip_failure_sort[1:94,c(1,62)]
+#print first 10 rows, Yearly_equip_failure and churn column
+#df_Yearly_equip_failure_sort[1:10,c(26,22)]
+#print first 10 rows,Yearly_equip_failure, techie and churn column
+#df_Yearly_equip_failure_sort[1:20,c(26,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Yearly_equip_failure_zScore))
+#z score for Tenure 
+df$Tenure_zScore <- scale(x=df$Tenure)
+#identify Tenure outliers using zscore
+Tenure_outliers <- df[which(df$Tenure_zScore < -3 | df$Tenure_zScore > 3),]
+#calculate quantity of outliers  
+num_of_outliers <- nrow(Tenure_outliers) #output = 0
+print(num_of_outliers)
+#sort data by Tenure outliers
+df_Tenure_sort <- df[order(-df$Tenure_zScore),]
+#print head of df_Tenure_sort
+head(df_Tenure_sort)
+#print first 10 rows
+grep("Tenure", colnames(df))
+#df_Tenure_sort[1:10,c(1,63)]
+#print first 10 rows, Tenure and churn column
+#df_Tenure_sort[1:10,c(42,22)]
+#print first 10 rows,Tenure, techie and churn column
+#df_Tenure_sort[1:20,c(42,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Tenure_zScore))
+#z score for MonthlyCharge 
+df$MonthlyCharge_zScore <- scale(x=df$MonthlyCharge)
+#identify MonthlyCharge outliers using zscore
+MonthlyCharge_outliers <- df[which(df$MonthlyCharge_zScore < -3 | df$MonthlyCharge_zScore > 3),]
+#calculate quantity of outliers  
+num_of_outliers <- nrow(MonthlyCharge_outliers) #output = 3
+print(num_of_outliers)
+#sort data by MonthlyCharge outliers
+df_MonthlyCharge_sort <- df[order(-df$MonthlyCharge_zScore),]
+#print head of df_MonthlyCharge_sort
+head(df_MonthlyCharge_sort)
+grep("MonthlyCharge", colnames(df))
+#print first 3 rows
+#df_MonthlyCharge_sort[1:3,c(1,64)]
+
+#print first 10 rows, MonthlyCharge and churn column
+#df_MonthlyCharge_sort[1:10,c(43,22)]
+#print first 10 rows,MonthlyCharge, techie and churn column
+#df_MonthlyCharge_sort[1:20,c(43,22,27)]
+#check for null/missing zscores
+sum(is.na(df$MonthlyCharge_zScore))
+#z score for Bandwidth_GB_Year 
+df$Bandwidth_GB_Year_zScore <- scale(x=df$Bandwidth_GB_Year)
+#identify Bandwidth_GB_Year outliers using zscore
+Bandwidth_GB_Year_outliers <- df[which(df$Bandwidth_GB_Year_zScore < -3 | df$Bandwidth_GB_Year_zScore > 3),]
+#calculate quantity of outliers  
+num_of_outliers <- nrow(Bandwidth_GB_Year_outliers) #output = 0
+print(num_of_outliers)
+#sort data by Bandwidth_GB_Year outliers
+df_Bandwidth_GB_Year_sort <- df[order(-df$Bandwidth_GB_Year_zScore),]
+#print head of df_Bandwidth_GB_Year_sort
+head(df_Bandwidth_GB_Year_sort)
+#print first 10 rows
+#df_Bandwidth_GB_Year_sort[1:10,c(1,65)]
+#print first 10 rows, Bandwidth_GB_Year and churn column
+#df_Bandwidth_GB_Year_sort[1:10,c(44,22)]
+#print first 10 rows,Bandwidth_GB_Year, techie and churn column
+#df_Bandwidth_GB_Year_sort[1:20,c(44,22,27)]
+#check for null/missing zscores
+sum(is.na(df$Bandwidth_GB_Year_zScore))
+
+#Histogram for all variables with missing values
+#histogram of Age
+hist(df$Age,xlab="age", main = "Histogram of age")
+#histogram of Income
+hist(df$Income, xlab="Income", main= "Histogram on Income")
+#histogram for Children
+hist(df$Children,xlab="children", main = "Histogram of children")
+#histogram for Bandwidth_GB_Year
+hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
+#histogram for Tenure
+hist(df$Tenure, xlab="Tenure", main = "Histogram of Tenure")
+
+#impute and replace NA values in all columns with NA values
+#impute age- numeric not skewed- impute mean
+df$Age[is.na(df$Age)] <- round(mean(df$Age, na.rm=TRUE))
+#confirm replace age NA with mean
+sum(is.na(df$Age))
+#replace NA Values in col Income- AVG negative skew normal distribution with skew and numeric impute median
+df$Income[is.na(df$Income)] <- median(df$Income, na.rm=TRUE)
+#confirm replace Income NA with median 
+sum(is.na(df$Income))
+#replace NA values in col Children - distribution negative skew and numeric data  will use median 
+df$Children[is.na(df$Children)] <- median(df$Children, na.rm=TRUE)
+#confirm replace Children NA with median 
+sum(is.na(df$Children))
+
+#replace NA values in col Tenure -has bimodal distribution- will use median
+df$Tenure[is.na(df$Tenure)] <- median(df$Tenure , na.rm=TRUE)
+#confirm replace Tenure NA with median
+sum(is.na(df$Tenure))
+#replace NA values in col Bandwidth_GB_Year - has bimodal distribution- will use median
+df$Bandwidth_GB_Year[is.na(df$Bandwidth_GB_Year)] <- median(df$Bandwidth_GB_Year, na.rm=TRUE)
+#confirm replace Bandwidth_GB_Year NA with mean
+sum(is.na(df$Bandwidth_GB_Year))
+#replace NA values in col Techie - negative skew distribution, but categorical string variable will use mode "1" for No. hardcode value since using mode resulted in new column added to histogram. 
+#converting to numeric here to impute values - otherwise major errors occurred with data type inconsistancies
+df$Techie 
+#df[,"Techie"]<- as.numeric(df[,"Techie"])
+summary<- df %>% 
+  count( Techie, sort = TRUE)
+summary
+#impute mode which is "No"
+df$Techie[is.na(df$Techie)] <- "No"
+df$Techie
+#cast to numeric to plot
+df$Techie<- as.numeric(as.factor(df$Techie))
+hist(df$Techie)
+
+#confirm replace Techie NA with mode 
+sum(is.na(df$Techie))
+#check for null values
+colSums(is.na(df))
+
+# recheck histograms to confirm imputed NA values after changes made
+#histogram of Age
+hist(df$Age,xlab="age", main = "Histogram of age")
+#histogram of Income
+hist(df$Income, xlab="Income", main= "Histogram on Income")
+#histogram for Children
+hist(df$Children,xlab="children", main = "Histogram of children")
+
+#histogram for Bandwidth_GB_Year
+hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
+#histogram for Tenure
+hist(df$Tenure, xlab="Tenure", main = "Histogram of Tenure")
+
+
+
+
+#df <- read.csv("churn_clean.csv", header=TRUE)
+colSums(is.na(df))
+
+#chisquared <-chisq.test(df$Churn,df$Techie)
+#chisquared
+
+##corrplot(chisquared$residuals, is.cor=FALSE)
+#contrib<- 100*chisquared$residuals^2/chisquared$statistic
+#round(contrib,3)
+#corrplot(contrib,is.cor=FALSE)
+
+#Univariate Statistical Analysis
+#categorical variables Techie and Churn
+#summarize categorical variable Techie
+#task2 <- tribble(  ~Techie,  "Yes",  "No")
+summary <- df %>%   count( Techie, sort = TRUE)
+summary
+#install.packages('psych')
+#install.packages('tidyverse')
+
+#summarize categorical variable Churn
+#1 no 2 yes
+#task2 <- tribble(
+#  ~ Churn,  "1", "2")
+summary <- df %>% 
+  count( Churn, sort = TRUE)
+summary
+#summarize categorical variable Area
+#Suburban, Rural, Urban
+#task2 <- tribble(
+#  ~ Area
+# ,  "1",
+# "2", "3")
+summary <- df %>% 
+  count( Area
+         , sort = TRUE)
+summary
+#summarize categorical variable Marital
+#Divorced Widowed Separated, Never Married, Married
+
+#task2 <- tribble(
+# ~ Marital
+
+#,  "1", "2", "3",
+#  "4", "5")
+summary <- df %>% 
+count( Marital
+
+  , sort = TRUE)
+summary
+#summarize categorical variable Gender
+#M F, Prefer not to answer
+#task2 <- tribble(
+#  ~ Gender
+# ,  "1",
+##  "2", "3")
+summary <- df %>% 
+count( Gender
+ , sort = TRUE)
+summary
+#summarize integer variable Children
+
+summary(df$Children)
+median(df$Children)
+#summarize integer variable Age
+summary(df$Age)
+
+#summarize integer variable Contacts
+summary(df$Contacts)
+
+#summarize continuous variable Yearly_equip_failure
+psych::describe(df$Yearly_equip_failure, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#summarize continuous variable Lat
+psych::describe(df$Lat, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#summarize continuous variable Lng
+psych::describe(df$Lng, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#summarize continuous variable Income
+psych::describe(df$Income, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#summarize continuous variable Tenure
+psych::describe(df$Tenure, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#summarize continuous variable MonthlyCharge
+psych::describe(df$MonthlyCharge, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#summarize continuous variable Bandwidth_GB_Year
+psych::describe(df$Bandwidth_GB_Year, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+
+
+colnames(df)
+#Univariate analysis 
+#Find median-negative skew bimodal distribution
+summary <- df %>% 
+  count( Churn
+         , sort = TRUE)
+summary
+df$Churn<- as.numeric(as.factor(df$Churn)) 
+hist(df$Churn, xlab="Churn", main = "Histogram of Churn")
+plot(density(df$Churn))
+
+##task2 <- tribble(
+# ~ Churn
+# ,  "2",
+#"1")
+#summary <- df %>% 
+# count( Churn
+#        , sort = TRUE)
+#summary
+#start here next time
+#summarize categorical variable Techie 
+#Find median-negative skew bimodal distribution
+#summary <- df %>% 
+# count( Techie
+#       , sort = TRUE)
+#summary
+
+df$Techie<- as.numeric(as.factor(df$Techie)) 
+hist(df$Techie, xlab="Techie", main = "Histogram of Techie")
+
+plot(density(df$Techie))
+summary <- df %>% 
+  count( Techie
+         , sort = TRUE)
+summary
+#summarize categorical variable Area 
+
+#Find trimodal distribution
+
+summary <- df %>% 
+  count( Area
+         , sort = TRUE)
+summary
+
+
+
+df$Area<- as.numeric(as.factor(df$Area)) 
+hist(df$Area, xlab="Area", main = "Histogram of Area")
+plot(density(df$Area))
+
+plot(density(df$Area))
+summary <- df %>% 
+  count( Area
+         , sort = TRUE)
+summary
+#summarize categorical variable Marital 
+
+#Find median-negative skew bimodal distribution
+#plot(density(df$Marital))
+summary <- df %>% 
+  count( Marital
+         , sort = TRUE)
+summary
+df$Marital<- as.numeric(as.factor(df$Marital)) 
+hist(df$Marital, xlab="Marital", main = "Histogram of Marital")
+plot(density(df$Marital))
+median(df$Marital)
+plot(density(df$Marital))
+summary <- df %>% 
+  count( Marital
+         , sort = TRUE)
+summary
+#summarize categorical variable Gender 
+
+#Find median-negative skew bimodal distribution
+summary <- df %>% 
+  count( Gender
+         , sort = TRUE)
+summary
+df$Gender<- as.numeric(as.factor(df$Gender)) 
+hist(df$Gender, xlab="Gender", main = "Histogram of Gender")
+plot(density(df$Gender))
+median(df$Gender)
+summary <- df %>% 
+  count( Gender
+         , sort = TRUE)
+summary
+#summarize categorical variable Children 
+
+#Find median-negative skew bimodal distribution
+summary <- df %>% 
+  count( Children
+         , sort = TRUE)
+summary
+
+hist(df$Children, xlab="Children", main = "Histogram of Children")
+plot(density(df$Children))
+
+#one hot encoding of categorical variables and reducing each to 2 options and 0/1 values
+
+
+
+#summarize categorical variable Age 
+
+#Find mean-normal distribution
+summary <- df %>% 
+  count( Age
+         , sort = TRUE)
+summary
+hist(df$Age, xlab="Age", main = "Histogram of Age")
+plot(density(df$Age))
+mean(df$Age)
+
+
+#summarize categorical variable Contacts 
+
+#Find median-negative skew bimodal distribution
+summary <- df %>% 
+  count( Contacts
+         , sort = TRUE)
+summary
+df$Contacts<- as.numeric(as.factor(df$Contacts)) 
+hist(df$Contacts, xlab="Contacts", main = "Histogram of Contacts")
+plot(density(df$Contacts))
+median(df$Contacts)
+
+#summarize categorical variable Yearly_equip_failure 
+
+#Find median-negative skew bimodal distribution
+summary <- df %>% 
+  count( Yearly_equip_failure
+         , sort = TRUE)
+summary
+df$Yearly_equip_failure<- as.numeric(as.factor(df$Yearly_equip_failure)) 
+hist(df$Yearly_equip_failure, xlab="Yearly_equip_failure", main = "Histogram of Yearly_equip_failure")
+plot(density(df$Yearly_equip_failure))
+median(df$Yearly_equip_failure)
+
+
+#Univariate analysis 
+#continuous variables
+
+
+
+#find median negative skew normal distribution
+
+plot(density(df$Income))
+median(df$Income)
+#summarize Income (continuous variable)
+describe(df$Income, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#Find Median negative skew normal distribution
+
+plot(density(df$Lat))
+median(df$Lat)
+#summarize Lat (continuous variable)
+describe(df$Lat, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#Find Median negative skew normal distribution
+
+plot(density(df$Lng))
+median(df$Lng)
+#summarize MonthlyCharge (continuous variable)
+describe(df$Lng, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#Find Median negative skew normal distribution
+
+plot(density(df$Tenure))
+median(df$Tenure)
+#summarize Tenure (continuous variable)
+describe(df$Tenure, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#Find Median negative skew normal distribution
+
+plot(density(df$MonthlyCharge))
+median(df$MonthlyCharge)
+#summarize MonthlyCharge (continuous variable)
+describe(df$MonthlyCharge, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+
+
+#find median negative skew normal distribution
+median(df$Bandwidth_GB_Year)
+plot(density(df$Bandwidth_GB_Year))
+#summarize Bandwidth_GB_Year (continuous variable)
+describe(df$Bandwidth_GB_Year, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+
+
+
+#Bivariate Statistical Analysis
+#independent variables on Churn
+#Turn these into heatmaps
+
+#install.packages("gplots")
+library(gplots)
+
+#categorical variable Techie and Churn  barchart
+
+
+dat <- data.frame(table(df$Techie,df$Churn))
+names(dat) <- c("Techie","Churn","Count")
+
+ggplot(data=dat, aes(x=Techie, y=Count, fill=Churn)) + geom_bar(stat="identity")
+
+
+#categorical variable Area and Churn  heatmap
+contingency_table <- table(df$Area, df$Churn)
+contingency_table2 <- table(df$Churn, df$Area)
+contingency_table
+contingency_table2
+#install.packages("gplots")
+
+# Heatmap of Churn vs Area 
+## 1 for No- 2 for Yes
+
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Area",
+          main = "Heatmap of Churn Vs. Area",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+
+#categorical variable Marital and Churn  heatmap
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Marital, df$Churn)
+contingency_table2 <- table(df$Churn, df$Marital)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Marital",
+          main = "Heatmap of Churn Vs. Marital",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+#categorical variable Gender and Churn  heatmap
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Gender, df$Churn)
+contingency_table2 <- table(df$Churn, df$Gender)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Gender",
+          main = "Heatmap of Churn Vs. Gender",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+#categorical variable Children and Churn  heatmap
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Children, df$Churn)
+contingency_table2 <- table(df$Churn, df$Children)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Children",
+          main = "Heatmap of Churn Vs. Children",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+#categorical variable Contacts and Churn  heatmap
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Contacts, df$Churn)
+contingency_table2 <- table(df$Churn, df$Contacts)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Contacts",
+          main = "Heatmap of Churn Vs. Contacts",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+#Yearly_equip_failure and Churn  heatmap
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Yearly_equip_failure, df$Churn)
+contingency_table2 <- table(df$Churn, df$Yearly_equip_failure)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Yearly_equip_failure",
+          main = "Heatmap of Churn Vs. Yearly_equip_failure",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+
+#Churn vs Age
+## 1 for No- 2 for Yes
+#Churn vs age
+## 1 for No- 2 for Yes
+contingency_table <- table(df$Age, df$Churn)
+contingency_table2 <- table(df$Churn, df$Age)
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "No(1) Yes(2) Churn ", ylab = "Age",
+          main = "Heatmap of Churn Vs. Age",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+
+
+
+boxplot(df$Churn ~ df$Lat,
+        col='steelblue',
+        main='Churn by Lat',
+        xlab='Lat',
+        ylab='Churn') 
+
+
+boxplot(df$Churn ~ df$Lng,
+        col='steelblue',
+        main='Churn by Lng',
+        xlab='Lng',
+        ylab='Churn') 
+
+
+boxplot(df$Churn ~ df$Income,
+        col='steelblue',
+        main='Churn by Income',
+        xlab='Income',
+        ylab='Churn') 
+
+
+boxplot(df$Churn ~ df$Tenure,
+        col='steelblue',
+        main='Churn by Tenure',
+        xlab='Tenure',
+        ylab='Churn') 
+
+
+
+boxplot(df$Churn ~ df$MonthlyCharge,
+        col='steelblue',
+        main='Churn by MonthlyCharge',
+        xlab='MonthlyCharge',
+        ylab='Churn') 
+
+boxplot(df$Churn ~ df$Bandwidth_GB_Year,
+        col='steelblue',
+        main='Churn by Bandwidth_GB_Year',
+        xlab='Bandwidth_GB_Year',
+        ylab='Churn') 
+
+
+
+# setting data types per variable ensure correct data types in each column
+
+df$Lat <- as.numeric(df$Lat)
+df$Lng <- as.numeric(df$Lng)
+df$Population <- as.integer(df$Population)
+df$Area <- as.character(df$Area)
+df$Children <- as.integer(df$Children)
+df$Age <- as.integer(df$Age)
+df$Income <- as.numeric(df$Income)
+df$Marital <- as.character(df$Marital)
+df$Gender <- as.character(df$Gender)
+df$Churn <- as.character(df$Churn)
+df$Contacts <- as.integer(df$Contacts)
+df$Yearly_equip_failure <- as.integer(df$Yearly_equip_failure)
+df$Techie <- as.character(df$Techie)
+df$Tenure <- as.numeric(df$Tenure)
+df$MonthlyCharge <- as.numeric(df$MonthlyCharge)
+df$Bandwidth_GB_Year <- as.numeric(df$Bandwidth_GB_Year)
+
+# factors
+#one hot encoding of categorical variables and reducing each to 2 options and 0/1 values
+
+df2 <- data.frame(
+  task_Lat = df$Lat,
+  task_Lng = df$Lng,
+  task_Population = df$Population,
+  task_Area = df$Area,
+  task_Children = df$Children,
+  task_Age = df$Age,
+  task_Income = df$Income,
+  task_Marital = df$Marital,
+  task_Gender = df$Gender,
+ task_Churn = df$Churn,
+  task_Contacts = df$Contacts,
+  task_Yearly_equip_failure = df$Yearly_equip_failure,
+ task_Techie = df$Techie,
+  task_Tenure = df$Tenure,
+  task_MonthlyCharge = df$MonthlyCharge,
+  task_Bandwidth_GB_Year = df$Bandwidth_GB_Year
+  )
+
+#df2 <-df2%>% 
+# mutate(  task_AreaSuburban=ifelse(df$Area=="1",1,0),
+#         task_AreaRural = ifelse(df$Area=='2', 1, 0),
+#       task_ChurnYes =ifelse(df$Churn=="2",1,0),
+#      task_TechieYes =ifelse(df$Techie=="2",1,0),
+#      task_MaritalWidowed =ifelse(df$Marital=="2",1,0),
+#      task_MaritalSeparated=ifelse(df$Marital=="3",1,0),
+#     task_MaritalNeverMarried=ifelse(df$Marital=="4",1,0),
+#     task_MaritalMarried =ifelse(df$Marital=="5",1,0),
+#    task_GenderFemale =ifelse(df$Gender=="Female",1,0),
+#   task_GenderMale =ifelse(df$Gender=="Male",1,0)
+
+#  )
+
+df2 <-df2%>% 
+  mutate(  task_AreaSuburban=ifelse(df$Area=="1",1,0),
+           task_AreaRural = ifelse(df$Area=='2', 1, 0),
+           task_ChurnYes =ifelse(df$Churn=="2",1,0),
+           task_TechieYes =ifelse(df$Techie=="2",1,0),
+           task_MaritalWidowed =ifelse(df$Marital=="2",1,0),
+           task_MaritalSeparated=ifelse(df$Marital=="3",1,0),
+           task_MaritalNeverMarried=ifelse(df$Marital=="4",1,0),
+         task_MaritalMarried =ifelse(df$Marital=="5",1,0),
+           task_GenderMale =ifelse(df$Gender=="2",1,0),
+         task_Female =ifelse(df$Gender=="1",1,0)
+    
+  )
+df2$task_AreaRural<- df2$task_AreaRural
+df2$task_AreaSuburban <- df2$task_AreaSuburban
+df2$task_ChurnYes <- df2$task_ChurnYes
+df2$task_TechieYes <- df2$task_TechieYes
+df2$task_MaritalMarried <- df2$task_MaritalMarried
+df2$task_MaritalWidowed<- df2$task_MaritalWidowed
+df2$task_MaritalSeparated<- df2$task_MaritalSeparated
+df2$task_MaritalNeverMarried<- df2$task_MaritalNeverMarried
+df2$task_Female <- df2$task_Female
+df2$task_GenderMale <- df2$task_GenderMale
+
+head(df2)
+#Point original categorical variables to null in order to one hot encode
+#df2$task_Area <- NULL
+#df2$task_Churn <- NULL
+#df2$task_Techie <- NULL
+#df2$task_Marital <- NULL
+#df2$task_Gender <- NULL
+
+#Copy data frame to remove these duplicate columns
+df3<-data.frame(df2)
+#df3$task_AreaSuburban <- NULL
+#df3$task_AreaRural <- NULL
+#df3$task_ChurnYes  <- NULL
+#df3$task_TechieYes  <- NULL
+#df3$task_MaritalWidowed  <- NULL
+#df3$task_MaritalSeparated <- NULL
+#df3$task_MaritalNeverMarried <- NULL
+#df3$task_MaritalMarried  <- NULL
+#df3$task_GenderFemale  <- NULL
+#df3$task_GenderMale <- NULL
+csv<-write.csv(cbind(df2), "./churn_data_clean.csv", row.names = FALSE)
+
+
+#df2 <- df2[!df2$task_Marital %in% c("Widowed"), ]
+#df2 <- df2[!df2$task_Gender %in% c("Prefer not to answer"), ]
+
+# logistic regression model
+df2$task_Churn<-as.factor(df2$task_Churn)
+lm_model <- glm(task_Churn ~  task_Income
+                +task_MaritalSeparated
+                             + task_GenderMale  + task_MonthlyCharge + 
+                           task_Bandwidth_GB_Year   + task_Tenure, 
+                           data = df2, family = binomial)
+
+
+summary(lm_model)
+
+#df2 for predictions
+unique(df2$task_Churn)
+
+train <- data.frame(
+  Churn = df2$task_Churn,
+  Income = df2$task_Income,
+  Gender = df2$task_GenderMale,
+  MonthlyCharge = df2$task_MonthlyCharge,
+  Bandwidth_GB_Year = df2$task_Bandwidth_GB_Year,
+  Tenure = df2$task_Tenure
+)
+
+#  levels 
+train$Churn <- factor(train$Churn, levels = c("1", "2"), labels = c("No", "Yes"))
+
+#  logistic regression
+logitMod <- glm(Churn ~ ., data = train, family = binomial(link = "logit"))
+
+pdata <- predict(logitMod, newdata = train, type = "response")
+
+
+predicted_class <- factor(ifelse(pdata > 0.5, "Yes", "No"), levels = c("No", "Yes"))
+
+
+
+
+conf_matrix <- confusionMatrix(data = predicted_class, reference = train$Churn)
+
+
+print(conf_matrix)
+
