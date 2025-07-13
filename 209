@@ -1,0 +1,199 @@
+
+#install ggplot2 for data visualization
+#install.packages("ggplot2")
+library(ggplot2)
+#install dplyr for data manipulation
+#install.packages("dplyr")
+library(dplyr)
+#load necessary packages
+#install.packages("lattice")
+library(lattice)
+#install.packages("caret")
+library(caret)
+#install.packages("cvms")
+library(cvms)
+library(corrplot)
+#install.packages("ConfusionTableR")
+library(ConfusionTableR)
+library(tidyverse)
+library(psych)
+#install.packages("tidyr")
+library(tidyr)
+#install.packages("ROCR")
+library(ROCR)
+#install.packages('pROC')
+library(pROC)
+#install.packages("rpart")
+library(rpart)
+#install.packages("class")
+library(class)
+# Load the randomForest package
+#install.packages("randomForest")
+library(randomForest)
+
+
+#get working directory
+getwd()
+#set wd to ensure working directory is in this file loc
+setwd("C:/Users/Administrator.NDESKTOP/d206-churn.dictionary.files")
+#create df using churn_raw_data.csv
+df <- read.csv("churn_raw_data.csv")
+#check data types using structure function
+str(df)
+#check null values
+sum(is.na(df))
+# check null cols
+colSums(is.na(df))
+#histogram of Income
+hist(df$Income, xlab="Income", main= "Histogram on Income")
+
+#histogram for Bandwidth_GB_Year
+hist(df$Bandwidth_GB_Year, xlab="Bandwidth_GB_Year", main = "Histogram of Bandwidth_GB_Year")
+
+#histogram for Tenure
+hist(df$Tenure, xlab="Tenure", main = "Histogram of Tenure")
+
+#Income impute for missing median as it is right skewed
+#replace NA Values in col Income- AVG negative skew normal distribution with skew and numeric impute median
+df$Income[is.na(df$Income)] <- median(df$Income, na.rm=TRUE)
+#confirm replace Income NA with median 
+sum(is.na(df$Income))
+
+#Bandwidth impute for missing median as it is right skewed
+#replace NA values in col Bandwidth_GB_Year - has bimodal distribution- will use median
+df$Bandwidth_GB_Year[is.na(df$Bandwidth_GB_Year)] <- median(df$Bandwidth_GB_Year, na.rm=TRUE)
+#confirm replace Bandwidth_GB_Year NA with mean
+sum(is.na(df$Bandwidth_GB_Year))
+
+#Tenure impute for missing median as it is right skewed
+#replace NA values in col Tenure -has bimodal distribution- will use median
+df$Tenure[is.na(df$Tenure)] <- median(df$Tenure , na.rm=TRUE)
+#confirm replace Tenure NA with median
+sum(is.na(df$Tenure))
+
+
+#check dimensions of data frame
+dim(df)
+#check for duplicate data
+df[duplicated(df) | duplicated(df, fromLast = TRUE), ]
+#cast the categorical char values to numeric
+df$Churn <- as.numeric(as.factor(df$Churn))
+df$Marital <-as.numeric(as.factor(df$Marital))
+df$Gender<-as.numeric(as.factor(df$Gender))
+
+train <- data.frame(
+  Churn = ifelse(df$Churn=="2",1,0),
+  Income = df$Income,
+  MaritalWidowed =ifelse(df$Marital=="2",1,0),
+  MaritalSeparated=ifelse(df$Marital=="3",1,0),
+  MaritalNeverMarried=ifelse(df$Marital=="4",1,0),
+  MaritalMarried =ifelse(df$Marital=="5",1,0),
+  MonthlyCharge = df$MonthlyCharge,
+  Bandwidth_GB_Year = df$Bandwidth_GB_Year,
+  Tenure = df$Tenure,
+  GenderMale =ifelse(df$Gender=="2",1,0),
+  GenderFemale =ifelse(df$Gender=="1",1,0)
+)
+train
+#csv<-write.csv(cbind(train), "./churn_data_cleanD209Pt2.csv", row.names = FALSE)
+## Determine the number of rows for training
+
+nrow(train)*.8
+
+# Create a random sample of row IDs
+sample_rows <- sample(nrow(train),nrow(train)*.8)
+#Split the data in an 80/20 train/test split
+# Create the training dataset
+churn_train <- train[sample_rows,]
+#write to csv-churn_train 8000
+#traincsv<-write.csv(cbind(churn_train), "./churn_data_cleanD209Pt2ChurnTrain.csv", row.names = FALSE)
+# Create the test dataset
+churn_test <- train[-sample_rows,]
+#write to csv-churn_test 2000
+#testcsv<-write.csv(cbind(churn_test), "./churn_data_cleanD209Pt2ChurnTest.csv", row.names = FALSE)
+
+
+#Knn
+# Use kNN to identify the test churn
+cl= churn_train$Churn
+Churn_pred <- knn(train = churn_train, test = churn_test,cl,k=75)
+#dim(churn_train)
+#cl
+#dim(churn_test)
+# Create a confusion matrix of the predicted versus actual values
+Churn_actual <- churn_test$Churn
+table(Churn_pred, Churn_actual)
+
+# Compute the accuracy
+mean(Churn_pred == Churn_actual)
+
+# Use the prob parameter to get the proportion of votes for the winning class
+churn_preds <- knn(train=churn_train, test=churn_test, cl=cl, k=75,prob=TRUE)
+
+# Get the "prob" attribute from the predicted classes
+churn_probs <- attr(churn_preds, "prob")
+
+# Examine the first several predictions
+head(churn_preds)
+
+# Examine the proportion of votes for the winning class
+head(churn_probs)
+
+#plot the confusion matrix
+table(churn_preds,churn_probs)
+
+#plot the AUC
+ROC <- roc(churn_preds,churn_probs)
+plot(ROC, col = "red")
+auc(ROC)
+
+nrow(train)
+
+
+
+# Grow a tree with maxdepth of 6
+churn_model2 <- rpart(Churn ~., data=churn_train, method="class", control=
+                      rpart.control(cp=0,maxdepth=6) )
+
+# Make a class prediction on the test set
+churn_test$pred2 <- predict(churn_model2, churn_test,type="class")
+
+# Compute the accuracy of the simpler tree
+mean(churn_test$pred2==churn_test$Churn)
+
+#Compute MSE-Mean Squared Error
+(1/2000) *(mean(churn_test$pred2==churn_test$Churn))^2 
+
+#  logistic regression
+#rfmMod <- glm(Churn ~ ., data = train, family = "binomial")
+
+#rfmprob <- predict(rfmMod, data = train, type = "response")
+
+#head(train)
+# Plot the ROC curve and find AUC for the new model
+#library(pROC)
+#ROC <- roc(train$Churn,rfmprob)
+#plot(ROC, col = "red")
+#auc(ROC)
+
+# Specify a null model with no predictors
+#null_model <- glm(Churn~1, data = train, family = "binomial")
+
+# Specify the full model using all of the potential predictors
+#full_model <- glm(Churn~.,data=train,family="binomial")
+
+# Use a forward stepwise algorithm to build a parsimonious model
+#step_model <- step(null_model, scope = list(lower = null_model, upper = full_model), direction = "forward")
+
+#summary(step_model)
+
+# Estimate the stepwise donation probability
+#step_prob <- predict(step_model,data=train,type="response")
+
+
+# Plot the ROC of the stepwise model
+#library(pROC)
+#ROC <- roc(train$Churn, step_prob)
+#plot(ROC, col = "red")
+#auc(ROC)
+
