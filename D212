@@ -1,0 +1,95 @@
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+df=pd.read_csv("Downloads\churn_clean.csv")
+df.head(10)
+
+df.info()
+
+df.describe(include="all").round(1)
+
+from matplotlib import pyplot as plt
+import seaborn as sns
+sns.set_theme()
+axs=sns.scatterplot(data=df,x="Income", y="Bandwidth_GB_Year",s=50)
+
+cluster_data=df[["Income","Bandwidth_GB_Year"]].describe().round(2)
+cluster_data
+
+from sklearn.preprocessing import StandardScaler
+scalerS= StandardScaler()
+scaleddf=scalerS.fit_transform(df[["Income","Bandwidth_GB_Year"]])
+scaleddf=pd.DataFrame(scaleddf,columns=["Income","Bandwidth_GB_Year"])
+scaleddf
+
+ 
+ from sklearn.cluster import KMeans
+kmodel=KMeans(n_clusters=3, n_init=25,random_state=300)
+kmodel.fit(scaleddf)
+
+KMeans
+KMeans(n_clusters=3, n_init=25, random_state=300)
+evalkmodel=pd.Series(kmodel.labels_).value_counts()
+
+secondplot=sns.scatterplot(data=df, x="Bandwidth_GB_Year", y="Income", s=50)
+
+findcentroid=pd.DataFrame(kmodel.cluster_centers_,columns=['Income','Bandwidth_GB_Year'])
+findcentroid
+
+plt.figure(figsize=(12,10))
+axs=sns.scatterplot(data=scaleddf, x="Income",y="Bandwidth_GB_Year", hue=kmodel.labels_,palette="colorblind",alpha=0.9,s=150,legend=True)
+
+axs=sns.scatterplot(data=findcentroid, x="Income",y="Bandwidth_GB_Year", hue=findcentroid.index,palette="colorblind",s=900, marker="D", ec="black",legend=False)
+for i in range(len(findcentroid)):
+        plt.text(x=findcentroid.Income[i], y=findcentroid.Bandwidth_GB_Year[i],s=i,horizontalalignment="center",verticalalignment="center",size=15,weight="bold",color="white")
+
+within_cluster_sum_squares=[]
+for k in range (2,11):
+    model=KMeans(n_clusters=k, n_init=50, random_state=300)
+    model.fit(scaleddf)
+    within_cluster_sum_squares.append(model.inertia_)
+    
+within_cluster_sum_squares_s=pd.Series(within_cluster_sum_squares,index=range(2,11))
+plt.figure(figsize=(12,10))
+axs=sns.lineplot(y=within_cluster_sum_squares_s, x=within_cluster_sum_squares_s.index)
+axs=sns.scatterplot(y=within_cluster_sum_squares_s, x=within_cluster_sum_squares_s.index,s=200)
+axs=axs.set(xlabel="Optimal Number of Clusters (k)", ylabel="Within Cluster Sum of Squares (WCSS)")
+
+from sklearn.metrics import silhouette_score
+silhouette_scored = silhouette_score(scaleddf,kmodel.labels_)
+silhouette_scored
+
+silhouette_df=[]
+for k in range(2,11):
+        model=KMeans(n_clusters=k, n_init=25, random_state=300)
+        model.fit(scaleddf)
+        silhouette_df.append(silhouette_score(scaleddf,model.labels_))
+        
+silhouette_df_s=pd.Series(silhouette_df, index=range(2,11))
+
+plt.figure(figsize=(12,10))
+axs=sns.lineplot(y=silhouette_df_s,x=silhouette_df_s.index)
+axs=sns.scatterplot(y=silhouette_df_s,x=silhouette_df_s.index,s=200)
+
+df['Clusters']=kmodel.labels_.tolist()
+df.head(12)
+
+
+gender = pd.get_dummies(df, columns=['Gender','Churn'])
+gender.head(12)
+
+
+gender.agg({'Gender_Female':'mean',
+            'Gender_Male':'mean',
+            'Gender_Nonbinary':'mean',
+            'Income':'median',
+            'Bandwidth_GB_Year': 'mean', 
+            'Churn_Yes':'mean', 'Churn_No':'mean'}).round(2)
+
+gender.groupby('Clusters').agg({'Gender_Female':'mean',
+            'Gender_Male':'mean',
+            'Gender_Nonbinary':'mean',
+            'Income':'median',
+            'Bandwidth_GB_Year': 'mean', 
+            'Churn_Yes':'mean', 'Churn_No':'mean'})
+		
