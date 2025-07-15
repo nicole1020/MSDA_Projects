@@ -1,0 +1,181 @@
+import string
+import pandas as pd
+import os
+os.chdir("C:\\Users\\Administrator.NDESKTOP\\Downloads\\sentiment+labelled+sentences\sentiment labelled sentences")
+col_names=['Review','Rating']
+df_amazon = pd.read_csv("amazon_cells_labelled.txt", sep='\t', names=col_names)
+df_imdb = pd.read_csv("imdb_labelled.txt", sep='\t', names=col_names)
+df_yelp = pd.read_csv("yelp_labelled.txt", sep='\t', names=col_names)
+df_amazon["Type"]="Amazon"
+df_amazon.head()
+
+df_amazon.info()
+
+df_imdb["Type"]="IMDB"
+df_imdb.head()
+
+df_imdb.info()
+
+df_yelp["Type"]="Yelp"
+df_yelp.head()
+
+df_yelp.info()
+
+frames = [df_amazon, df_imdb, df_yelp]
+
+df = pd.concat(frames)
+df.head()
+
+df.info()
+
+print(df)
+                                       
+df['totalwords']=[len(x.split()) for x in df['Review'].tolist()]
+df['totalchars']=df['Review'].apply(len)
+df
+
+
+df.info()
+
+df['Review']=df['Review'].str.lower()
+df.to_csv(r"C:\Users\Administrator.NDESKTOP\Downloads\D213Pt2.csv")
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer 
+porter=PorterStemmer()
+import tensorflow as tf
+
+from tensorflow.keras.preprocessing.text import Tokenizer
+from keras.preprocessing import sequence
+stop_words = set(stopwords.words('english'))
+data_set = []
+for sentence in df['Review']:
+    data_set.append([word for word in word_tokenize(sentence) if word not in stop_words])
+print(data_set)
+
+tokenizer= Tokenizer(num_words = vocab_size)
+tokenizer.fit_on_texts(x)
+x=tokenizer.texts_to_sequences(x)
+print('''\n''',x)
+df.shape
+df.columns
+df.head()
+
+from nltk.stem import WordNetLemmatizer 
+lemmatizer=WordNetLemmatizer()
+def lem (token_text):
+    text=[lemmatizer.lemmatize(word) for word in token_text]
+    return text
+nltk.download('wordnet')
+
+df['Review'].apply(lambda x:lem(x))
+df['lemmed_words']=[len(x.split()) for x in df['Review'].tolist()]
+df['lemmed_chars']=df['Review'].apply(len)
+df.head(5)
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+max_length=24
+x=pad_sequences(x,maxlen=max_length,padding='post',truncating='post')
+print(x.shape)
+
+print(tokenizer.word_index)
+
+df.head(2)
+
+from sklearn.model_selection import train_test_split
+df.index+=1
+df.head(4)
+
+import numpy as np
+X = x
+y = df['Rating']
+print(X.shape)
+print(y.shape)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+print(X_train.shape)
+np.savetxt(r"C:\Users\Administrator.NDESKTOP\Downloads\D213Pt2X_train.csv",X_train, delimiter=",")
+print(X_test.shape)
+np.savetxt(r"C:\Users\Administrator.NDESKTOP\Downloads\D213Pt2X_test.csv",X_test, delimiter=",")
+
+print(y_train.shape)
+np.savetxt(r"C:\Users\Administrator.NDESKTOP\Downloads\D213Pt2y_train.csv",y_train, delimiter=",")
+print(y_test.shape)
+np.savetxt(r"C:\Users\Administrator.NDESKTOP\Downloads\D213Pt2y_test.csv",y_test, delimiter=",")
+
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
+model = models.Sequential()
+model.add(layers.Embedding(input_dim=vocab_size, output_dim=64, input_length=max_length))
+model.add(layers.Bidirectional(layers.LSTM(64, return_sequences=True)))
+model.add(layers.GlobalMaxPooling1D())
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dropout(0.5))
+model.add(layers.Dense(3, activation='softmax')) 
+ 
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+#10000 vocab
+#28 79.4,5.92
+#29 78% and 3.5
+#30 78% 4.2
+#31 79, 4.72
+#32 79.6% 1.2 10 epochs, 20 epochs 3.6 loss 78%, 15 epoch-2.81 79.1%, 15/32 fresh train-Test Loss: 0.9444 Test Accuracy: 0.8006
+#32 55 epochs overfit Test Loss: 2.1947 Test Accuracy: 0.7918
+#32 20 epochs -2.8 loss, accuracy 78%
+#32 18 epochs Test Loss: 1.5932 Test Accuracy: 0.7787
+#32 14 epochs Test Loss: 1.1655 Test Accuracy: 0.7977
+#32 13 epochs Test Loss: 0.8976 Test Accuracy: 0.7962 
+#32 12 epochs Test Loss: 0.7211 Test Accuracy: 0.8137 **best so far Test Loss: 1.1975 Test Accuracy: 0.7962
+#32 11 epochs Test Loss: 0.9601 Test Accuracy: 0.8064
+#15000 vocab
+#32 12 epoch= Test Loss: 1.2862 Test Accuracy: 0.8093
+#13000 vocab Test Loss: 1.1562 Test Accuracy: 0.7860
+#11000 vocab Test Loss: 1.2483 Test Accuracy: 0.7656
+
+history = model.fit(X_train, y_train, 
+                    epochs=12,
+                    batch_size=32,
+                    validation_data=(X_test, y_test))
+
+from sklearn.metrics import classification_report, confusion_matrix
+
+
+y_pred_probs = model.predict(X_test)
+y_pred = y_pred_probs.argmax(axis=1)  
+
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f"Test Loss: {loss:.4f}")
+print(f"Test Accuracy: {accuracy:.4f}")
+
+ 
+#accuracy
+plt.plot(history.history['accuracy'], label='train acc')
+plt.plot(history.history['val_accuracy'], label='Test acc')
+plt.title('Model Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+#loss
+plt.plot(history.history['loss'], label='train loss')
+plt.plot(history.history['val_loss'], label='Test loss')
+plt.title('Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+
+model.summary()
