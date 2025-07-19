@@ -1,0 +1,113 @@
+
+library(psych)
+library(dplyr)
+#get working directory
+getwd()
+setwd("C:/Users/Administrator.NDESKTOP/OneDrive/Desktop/D207 churn")
+#create df using churn_clean.csv
+task1 <- read.csv("churn_clean.csv", header=TRUE)
+colSums(is.na(task1))
+
+chisquared <-chisq.test(task1$Churn,task1$Techie)
+chisquared
+library(corrplot)
+corrplot(chisquared$residuals, is.cor=FALSE)
+contrib<- 100*chisquared$residuals^2/chisquared$statistic
+round(contrib,3)
+corrplot(contrib,is.cor=FALSE)
+
+#Univariate Statistical Analysis
+#categorical variables Techie and Churn
+#summarize categorical variable Techie
+task2 <- tribble(
+   ~Techie,  "Yes",
+  "No")
+summary <- task1 %>% 
+  count( Techie, sort = TRUE)
+summary
+#install.packages('psych')
+#install.packages('tidyverse')
+library(tidyverse)
+#summarize categorical variable Churn
+task2 <- tribble(
+  ~ Churn,  "Yes", "No")
+
+summary <- task1 %>% 
+  count(Churn, sort = TRUE)
+summary
+#Find median-negative skew bimodal distribution
+median(task1$Churn)
+task1$Churn<- as.numeric(as.factor(task1$Churn)) 
+hist(task1$Churn, xlab="Churn", main = "Histogram of Churn")
+plot(density(task1$Churn))
+qqnorm(task1$Churn,pch=1,frame=FALSE,main="QQ plot of Churn")
+qqline(task1$Churn,col="steelblue",lwd=2)
+
+
+#summarize categorical variable Techie 
+dplyr::count(task1$Techie, x, sort = TRUE)
+#Find median-negative skew bimodal distribution
+median(task1$Techie)
+task1$Techie<- as.numeric(as.factor(task1$Techie)) 
+hist(task1$Techie, xlab="Techie", main = "Histogram of Techie")
+plot(density(task1$Techie))
+qqnorm(task1$Techie,pch=1, frame=FALSE,main="QQ plot of Techie")
+qqline(task1$Techie,col="steelblue",lwd=2)
+
+
+#Univariate analysis 
+#continuous variables Income and MonthlyCharge
+
+#find median negative skew normal distribution
+median(task1$Income)
+plot(density(task1$Income))
+#summarize Income (continuous variable)
+describe(task1$Income, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+#Find Median negative skew normal distribution
+median(task1$MonthlyCharge)
+plot(density(task1$MonthlyCharge))
+#summarize MonthlyCharge (continuous variable)
+describe(task1$MonthlyCharge, na.rm=TRUE, interp=FALSE, skew = TRUE, ranges = TRUE)
+
+#Bivariate Statistical Analysis
+#continuous Variables Income and MonthlyCharge 
+#qq plot Income, Monthly Charge
+
+plot2<-qqplot(task1$Income, task1$MonthlyCharge, main="QQ plot MonthlyCharge v.Income")
+
+#Scatter Plot of Monthly Charge vs. Income
+plot_continuous <- plot(task1$MonthlyCharge, task1$Income, 
+                        xlab = "Monthly Charge", ylab = "Income",
+                        main = "Scatter Plot of Monthly Charge vs. Income")
+correlation_coefficient <- cor(task1$MonthlyCharge, task1$Income)
+lm_model <- lm(Income ~ MonthlyCharge, data = task1)
+summary(lm_model)
+# Residual Plot Monthly Charge vs. Income
+plot(lm_model$fitted.values, lm_model$residuals,
+     xlab = "Fitted Values", ylab = "Residuals",
+     main = "Residual Plot")
+abline(h = 0, col = "red") 
+
+#Bivariate Statistical Analysis'
+
+#categorical variables Churn and Techie-heatmap
+contingency_table <- table(task1$Techie, task1$Churn)
+contingency_table2 <- table(task1$Churn, task1$Techie)
+#rownames(contingency_table) <- c("Yes", "No")
+#colnames(contingency_table) <- c("Yes", "No")
+#install.packages("gplots")
+library(gplots)
+# Heatmap of Techie vs. Churn
+heatmap.2(contingency_table, 
+          Rowv = NULL, Colv = NULL,  
+          col = heat.colors(10),   
+          scale = "none",           
+          xlab = "Churn", ylab = "Techie",
+          main = "Heatmap of Techie vs. Churn",
+          trace = "none",           
+          dendrogram = "none",      
+          cellnote = contingency_table,
+          notecol = "black")  
+
+
+
