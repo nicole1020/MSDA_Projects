@@ -1,0 +1,89 @@
+import pandas as pd
+df=pd.read_csv("C:\\Users\\nicol\\Downloads\\MSDA Capstone\\House_Rent_Dataset.csv")
+import numpy as np
+import matplotlib.pyplot as plt
+X = df[['Size', 'BHK', 'Bathroom']] 
+y = df['Rent']    
+X = X.dropna()
+y = y[X.index] 
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+df.head(2)
+
+df.describe(include="all").round(1)
+
+df.info()
+
+from matplotlib import pyplot as plt
+import seaborn as sns
+sns.set_theme()
+axs=sns.scatterplot(data=df,x="Rent", y="Size",s=50)
+No description has been provided for this image
+cluster_data=df[["Rent","Size"]].describe().round(2)
+cluster_data
+
+from sklearn.preprocessing import StandardScaler
+scalerS= StandardScaler()
+scaleddf=scalerS.fit_transform(df[["Rent","Size"]])
+scaleddf=pd.DataFrame(scaleddf,columns=["Rent","Size"])
+scaleddf
+
+
+ from sklearn.cluster import KMeans
+kmodel=KMeans(n_clusters=3, n_init=25,random_state=300)
+kmodel.fit(scaleddf)
+
+evalkmodel=pd.Series(kmodel.labels_).value_counts()
+
+secondplot=sns.scatterplot(data=df, x="Size", y="Rent", s=50)
+No description has been provided for this image
+findcentroid=pd.DataFrame(kmodel.cluster_centers_,columns=['Rent','Size'])
+findcentroid
+
+axs=sns.scatterplot(data=scaleddf, x="Rent",y="Size", hue=kmodel.labels_,palette="colorblind",alpha=0.9,s=150,legend=True)
+
+axs=sns.scatterplot(data=findcentroid, x="Rent",y="Size", hue=findcentroid.index,palette="colorblind",s=900, marker="D", ec="black",legend=False)
+for i in range(len(findcentroid)):
+        plt.text(x=findcentroid.Rent[i], y=findcentroid.Size[i],s=i,horizontalalignment="center",verticalalignment="center",size=15,weight="bold",color="white")
+No description has been provided for this image
+within_cluster_sum_squares=[]
+for k in range (2,11):
+    model=KMeans(n_clusters=k, n_init=50, random_state=300)
+    model.fit(scaleddf)
+    within_cluster_sum_squares.append(model.inertia_)
+    
+within_cluster_sum_squares_s=pd.Series(within_cluster_sum_squares,index=range(2,11))
+plt.figure(figsize=(12,10))
+axs=sns.lineplot(y=within_cluster_sum_squares_s, x=within_cluster_sum_squares_s.index)
+axs=sns.scatterplot(y=within_cluster_sum_squares_s, x=within_cluster_sum_squares_s.index,s=200)
+axs=axs.set(xlabel="Optimal Number of Clusters (k)", ylabel="Within Cluster Sum of Squares (WCSS)")
+No description has been provided for this image
+from sklearn.metrics import silhouette_score
+silhouette_scored = silhouette_score(scaleddf,kmodel.labels_)
+silhouette_scored
+
+silhouette_df=[]
+for k in range(2,11):
+        model=KMeans(n_clusters=k, n_init=25, random_state=300)
+        model.fit(scaleddf)
+        silhouette_df.append(silhouette_score(scaleddf,model.labels_))
+        
+silhouette_df_s=pd.Series(silhouette_df, index=range(2,11))
+
+plt.figure(figsize=(12,10))
+axs=sns.lineplot(y=silhouette_df_s,x=silhouette_df_s.index)
+axs=sns.scatterplot(y=silhouette_df_s,x=silhouette_df_s.index,s=200)
+No description has been provided for this image
+df['Clusters']=kmodel.labels_.tolist()
+df.head(12)
+
+categoricals= pd.get_dummies(df, columns=['Area Type','Tenant Preferred'])
+categoricals.head(12)
+
+categoricals.to_csv(r"C:\\Users\\nicol\\Downloads\\MSDA Capstone\\categoricals.csv")
+categoricals.agg({'Area Type_Built Area':'mean', 'Area Type_Carpet Area':'mean', 'Area Type_Super Area':'mean','Tenant Preferred_Bachelors':'mean','Tenant Preferred_Bachelors/Family':'mean','Tenant Preferred_Family':'mean'}).round(2)
+
+categoricals.groupby('Clusters').agg({'Area Type_Built Area':'mean', 'Area Type_Carpet Area':'mean', 'Area Type_Super Area':'mean','Tenant Preferred_Bachelors':'mean','Tenant Preferred_Bachelors/Family':'mean','Tenant Preferred_Family':'mean'})
+
+ 
